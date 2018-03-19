@@ -257,7 +257,7 @@ void SendLedScreamCmd (void)
 {
 	u16 calCRC;
 	unsigned char i=0;
-	unsigned char revLen=0;
+	//unsigned char revLen=0;
 	unsigned char  rs485buf[64];
 	
 	{
@@ -557,6 +557,16 @@ int ReadNo2Ppm (void)
 	RS485_Receive_Data(NO2_RX_BUF,&revLen);//读取十八个数据
 	if(revLen == 18)
 	{
+		//判断读回的数据是否是So2
+		//so2 0x0A
+		//no2 0x16
+		if(0x0A == NO2_RX_BUF[14])
+		{
+			NO2_TX_BUF[3] = 0x03;
+			SO2_TX_BUF[3] = 0x02;
+			return false;
+		}
+			
 		No2PpmTmp = (NO2_RX_BUF[10]<<16)|(NO2_RX_BUF[11]<<8)|NO2_RX_BUF[12];	 
 		
 		No2PpmTmp = (No2PpmTmp&0x0F)+10*((No2PpmTmp>>4)&0x0F)+\
@@ -595,6 +605,16 @@ int ReadSo2Ppm (void)
 	RS485_Receive_Data(SO2_RX_BUF,&revLen);//读取十八个数据
 	if(revLen == 18)
 	{
+		//判断读回的数据是否是No2
+		//so2 0x0A
+		//no2 0x16
+		if(0x16 == SO2_RX_BUF[14])
+		{
+			SO2_TX_BUF[3] = 0x02;
+			NO2_TX_BUF[3] = 0x03;
+			return false;
+		}
+		
 		So2PpmTmp = (SO2_RX_BUF[10]<<16)|(SO2_RX_BUF[11]<<8)|SO2_RX_BUF[12];	 
 		
 		So2PpmTmp = (So2PpmTmp&0x0F)+10*((So2PpmTmp>>4)&0x0F)+\
@@ -639,7 +659,7 @@ int ReadO3Ppm (void)
 		100*((O3PpmTmp>>8)&0x0F)+1000*((O3PpmTmp>>12)&0x0F)+\
 		10000*((O3PpmTmp>>16)&0x0F)+100000*((O3PpmTmp>>20)&0x0F);
 		
-		O3PpmTmp = O3PpmTmp / 2.0;
+		//O3PpmTmp = O3PpmTmp / 2.0;
 		
 		for(i=5;i<16;i++){
 			cTemp += O3_RX_BUF[i];

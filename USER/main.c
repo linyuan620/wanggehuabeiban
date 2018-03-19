@@ -163,7 +163,7 @@ float get_voltage_pwm(void)
         sum += ADCConvertedValue[i * M + 2];   
     }  
     sum /= 10;  
-    v = 2*(3.0/4096) * sum;  
+    v = (3.0/4096) * sum;  
  
     return v;  
 } 
